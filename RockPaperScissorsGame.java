@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -7,44 +8,99 @@ public class RockPaperScissorsGame {
         Scanner sc = new Scanner(System.in);
         Random random = new Random();
 
-        // Generate a random number 0(inclusive) to 3(exclusive)
-        int randomNumber0to2 = random.nextInt(3);
-        // map computer's choice 1 For Rock 2 for Paper and 3 For Scissors
-        int computerChoice = randomNumber0to2 + 1;
-        // taking user choice
-        System.out.println("Let's play Rock Paper Scissors Game \n\t1.For Rock\n\t2.For Paper\n\t3.For Scissors \nEnter your choice: ");
-        int userChoice;
+        
+        System.out.println("How many round you want to play?");
+        int numRounds;
         try{
-            userChoice = sc.nextInt();
-        }catch (java.util.InputMismatchException e){
-            System.out.println("Please select integer number 1 or 2 or 3.");
+            numRounds = sc.nextInt();
+            if (numRounds <= 0) {
+                System.out.println("Please enter a positive number of rounds.");
+                sc.close();
+                return;
+            }
+        } catch(InputMismatchException e){
+            System.out.println("Pleae enter a whole number of rounds.");
             sc.close();
             return;
         }
-        // win decide
-        boolean computerWin = false;
-        boolean userWin = false;
-        switch (computerChoice) {
-            case 1:
-                if (userChoice == 2) {
-                    userWin = true;
+
+        int countComputerWin = 0;
+        int countUserWin = 0;
+        int countDraw = 0;
+        int currentRound = 1;
+
+        while (currentRound <= numRounds) {
+            System.out.println("\n----Round "+currentRound+" --------");            
+            // computer choice generate for each round
+            int computerChoice = random.nextInt(3)+1;
+
+            int userChoice;
+            while (true) { // untile valid input is received
+                System.out.println("Enter your choice:");
+                System.out.println("\t1. Rock");
+                System.out.println("\t2. Paper");
+                System.out.println("\t3. Scissors");
+                System.out.print("Your choice: ");
+
+                try{
+                    userChoice = sc.nextInt();
+                    if (userChoice >= 1 && userChoice <= 3) {
+                        break;
+                    }else{
+                        System.out.println("Invalid input. Please enter 1, 2 or 3..");
+                    }
+                } catch (InputMismatchException e){
+                    System.out.println("Invalid input! Please enter 1, 2 or 3...");
+                    sc.next();
                 }
-                break;
-            case 2:
-                if (userChoice == 3) {
-                    userWin = true;
-                }
-                break;
-            case 3:
-                if (userChoice == 1) {
-                    userWin = true;
-                }
-                break;
-        
-            default:
-                System.out.println("You enter wrong value! Try again....");
-                break;
+            }
+
+            // Display choices
+            String computerMove = mapChoiceToString(computerChoice);
+            String userMove = mapChoiceToString(userChoice);
+            System.out.println("Computer choice: "+computerChoice);
+            System.out.println("User choice: "+userChoice);
+
+            // Determine winner for the current rounds
+            if (userChoice == computerChoice) {
+                System.out.println("It's a Draw!");
+                countDraw++;
+            }else if ((userChoice == 1 && computerChoice == 3)||
+                      (userChoice == 2 && computerChoice == 1) ||
+                      (userChoice == 3 && computerChoice == 2)) {
+                System.out.println("You win this rounds!");
+                countUserWin++;
+            }else{
+                System.out.println("Computer win this round!");
+                countComputerWin++;
+            }
+            currentRound++;
         }
-        System.out.println(userWin ? "Congratulation! You win" : "Sorry! You lossed");
+
+        // Display Tournament Result
+        System.out.println("\n ------- Tournament Result ------");
+        System.out.println("You wins      : "+countUserWin);
+        System.out.println("Computer wins : "+countComputerWin);
+        System.out.println("Draws         : "+countDraw);
+
+        // Calculate and display tournament winner
+        if (countUserWin > countComputerWin) {
+            System.out.println("Congratulation! You win the tournament..");
+        }else if (countComputerWin > countUserWin) {
+            System.out.println("Sorry! Computer win the tournament..");
+        }else{
+            System.out.println("The tournament is a Draw!");
+        }
+
+    }
+
+    // Helper method to map integer to string
+    public static String mapChoiceToString(int choice){
+        switch (choice) {
+            case 1: return "Rock";
+            case 2: return "Paper";
+            case 3: return "Scissors";
+            default: return "Invalid choice";
+        }
     }
 }
